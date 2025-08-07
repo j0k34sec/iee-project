@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface Team {
   id: string
@@ -173,38 +174,104 @@ export default function ShortlistedCandidates({ teams = [] }: ShortlistedCandida
               <div className="md:col-span-1">Submitted</div>
             </div>
             
-            <div 
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
               className="divide-y divide-purple-500/20 max-h-[400px] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-purple-500/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-purple-500/50"
               style={{ scrollbarGutter: 'stable' }}>
-              {sortedTeams.map((team) => (
-                <div key={team.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 hover:bg-purple-900/20 transition-colors">
-                  <div className="md:col-span-3">
-                    <div className="font-medium text-purple-200">{team.name}</div>
-                  </div>
-                  <div className="md:col-span-4">
-                    <div className="text-purple-300 text-sm">{team.projectTitle}</div>
-                  </div>
-                  <div className="md:col-span-2">
-                    <Badge className={getStatusColor(team.status)}>
-                      {getStatusIcon(team.status)} {team.status.replace('-', ' ')}
-                    </Badge>
-                  </div>
-                  <div className="md:col-span-2">
-                    <div className="text-purple-300 text-sm">
-                      👥 {team.members} member{team.members !== 1 ? 's' : ''}
-                    </div>
-                  </div>
-                  <div className="md:col-span-1">
-                    <div className="text-purple-300 text-xs">
-                      {new Date(team.submittedAt).toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric' 
-                      })}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+              <AnimatePresence mode="popLayout">
+                {sortedTeams.map((team) => (
+                  <motion.div 
+                    key={team.id}
+                    initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                    animate={{ 
+                      opacity: 1, 
+                      y: 0, 
+                      scale: 1,
+                      transition: {
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 15,
+                        mass: 1
+                      }
+                    }}
+                    exit={{ 
+                      opacity: 0, 
+                      scale: 0.95, 
+                      y: -20,
+                      transition: {
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 15
+                      }
+                    }}
+                    whileHover={{ 
+                      scale: 1.02,
+                      backgroundColor: "rgba(147, 51, 234, 0.1)",
+                      transition: { type: "spring", stiffness: 400, damping: 20 }
+                    }}
+                    layout
+                    className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 hover:bg-purple-900/20 transition-colors rounded-lg"
+                  >
+                    <motion.div 
+                      layout
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.1 }}
+                      className="md:col-span-3"
+                    >
+                      <div className="font-medium text-purple-200">{team.name}</div>
+                    </motion.div>
+                    <motion.div 
+                      layout
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="md:col-span-4"
+                    >
+                      <div className="text-purple-300 text-sm">{team.projectTitle}</div>
+                    </motion.div>
+                    <motion.div 
+                      layout
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 }}
+                      className="md:col-span-2"
+                    >
+                      <Badge className={getStatusColor(team.status)}>
+                        {getStatusIcon(team.status)} {team.status.replace('-', ' ')}
+                      </Badge>
+                    </motion.div>
+                    <motion.div 
+                      layout
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="md:col-span-2"
+                    >
+                      <div className="text-purple-300 text-sm">
+                        👥 {team.members} member{team.members !== 1 ? 's' : ''}
+                      </div>
+                    </motion.div>
+                    <motion.div 
+                      layout
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.5 }}
+                      className="md:col-span-1"
+                    >
+                      <div className="text-purple-300 text-xs">
+                        {new Date(team.submittedAt).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           </div>
 
           {/* Auto-update Notice */}
