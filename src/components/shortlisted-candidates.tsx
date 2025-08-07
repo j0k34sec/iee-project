@@ -173,7 +173,9 @@ export default function ShortlistedCandidates({ teams = [] }: ShortlistedCandida
               <div className="md:col-span-1">Submitted</div>
             </div>
             
-            <div className="divide-y divide-purple-500/20">
+            <div 
+              className="divide-y divide-purple-500/20 max-h-[400px] overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-purple-500/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent hover:[&::-webkit-scrollbar-thumb]:bg-purple-500/50"
+              style={{ scrollbarGutter: 'stable' }}>
               {sortedTeams.map((team) => (
                 <div key={team.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 hover:bg-purple-900/20 transition-colors">
                   <div className="md:col-span-3">
