@@ -665,7 +665,7 @@ export default function Home() {
 
       {/* Shortlisted Candidates Section */}
       <ParallaxSection speed={0.05}>
-        <section id="teams" className="py-16">
+        <section id="teams" className="py-24 mb-16">
         <div className="container mx-auto px-4">
           <FadeIn delay={2.2}>
             <ShortlistedCandidates teams={teams} />
@@ -676,7 +676,7 @@ export default function Home() {
 
       {/* Contact Section */}
       <ParallaxSection speed={0.08}>
-        <section id="contact" className="py-16 bg-black/40">
+        <section id="contact" className="py-24 mt-16 bg-black/40">
         <div className="container mx-auto px-4">
           <FadeIn delay={2.3}>
             <div className="max-w-4xl mx-auto text-center">
