@@ -163,74 +163,81 @@ export default function Home() {
 
   useEffect(() => {
     // Fetch teams, timeline, countdown, core team, and event organizers from API
-    const fetchData = async () => {
+    const fetchApiJson = async (path: string) => {
       try {
-        const [teamsResponse, timelineResponse, countdownResponse, coreTeamResponse, eventOrganizersResponse, registrationLinkResponse, contactInfoResponse] = await Promise.all([
-          fetch('/api/teams'),
-          fetch('/api/timeline'),
-          fetch('/api/countdown'),
-          fetch('/api/core-team'),
-          fetch('/api/event-organizers'),
-          fetch('/api/registration-link'),
-          fetch('/api/contact-us')
-        ])
-        
-        const teamsData = await teamsResponse.json()
-        const timelineData = await timelineResponse.json()
-        const countdownData = await countdownResponse.json()
-        const coreTeamData = await coreTeamResponse.json()
-        const eventOrganizersData = await eventOrganizersResponse.json()
-        const registrationLinkData = await registrationLinkResponse.json()
-        const contactInfoData = await contactInfoResponse.json()
-        
-        setTeams(teamsData.teams || [])
-        setTimelinePhases(timelineData.phases || [])
-        
-        if (countdownData.success && countdownData.countdown) {
-          setCountdownConfig(countdownData.countdown)
-          // Check if countdown is properly configured with valid date
-          const isValidConfig = countdownData.countdown.isActive && 
-                               countdownData.countdown.targetDate && 
-                               countdownData.countdown.targetTime &&
-                               countdownData.countdown.targetDate.trim() !== "" &&
-                               countdownData.countdown.targetTime.trim() !== ""
-          setIsCountdownConfigured(isValidConfig)
-        } else {
-          setIsCountdownConfigured(false)
+        const res = await fetch(path)
+        const bodyText = await res.text()
+        if (!res.ok) {
+          console.error(`Request failed ${path} ${res.status}`, bodyText.slice(0, 300))
+          return null
         }
-        
-        if (coreTeamData.success && coreTeamData.coreTeam) {
-          setCoreTeam(coreTeamData.coreTeam)
+        try {
+          return JSON.parse(bodyText)
+        } catch (err) {
+          console.error(`Invalid JSON from ${path}`, bodyText.slice(0, 300))
+          return null
         }
-        
-        if (eventOrganizersData.success && eventOrganizersData.eventOrganizers) {
-          setEventOrganizers(eventOrganizersData.eventOrganizers)
-        }
-        
-        if (registrationLinkData.success && registrationLinkData.registrationLink) {
-          setRegistrationLink(registrationLinkData.registrationLink)
-        }
-        
-        if (contactInfoData.success && contactInfoData.contactInfo) {
-          // Parse social media if it's a string, otherwise use as-is
-          const parsedContactInfo = {
-            ...contactInfoData.contactInfo,
-            socialMedia: typeof contactInfoData.contactInfo.socialMedia === 'string' 
-              ? JSON.parse(contactInfoData.contactInfo.socialMedia) 
-              : (Array.isArray(contactInfoData.contactInfo.socialMedia) ? contactInfoData.contactInfo.socialMedia : [contactInfoData.contactInfo.socialMedia])
-          }
-          setContactInfo(parsedContactInfo)
-        }
-      } catch (error) {
-        console.error('Failed to fetch data:', error)
+      } catch (err) {
+        console.error(`Network error for ${path}`, err)
+        return null
       }
     }
-    
+
+    const fetchData = async () => {
+      const [teamsData, timelineData, countdownData, coreTeamData, eventOrganizersData, registrationLinkData, contactInfoData] = await Promise.all([
+        fetchApiJson('/api/teams'),
+        fetchApiJson('/api/timeline'),
+        fetchApiJson('/api/countdown'),
+        fetchApiJson('/api/core-team'),
+        fetchApiJson('/api/event-organizers'),
+        fetchApiJson('/api/registration-link'),
+        fetchApiJson('/api/contact-us')
+      ])
+
+      setTeams(teamsData?.teams || [])
+      setTimelinePhases(timelineData?.phases || [])
+
+      if (countdownData?.success && countdownData.countdown) {
+        setCountdownConfig(countdownData.countdown)
+        const isValidConfig = countdownData.countdown.isActive &&
+                             countdownData.countdown.targetDate &&
+                             countdownData.countdown.targetTime &&
+                             countdownData.countdown.targetDate.trim() !== "" &&
+                             countdownData.countdown.targetTime.trim() !== ""
+        setIsCountdownConfigured(isValidConfig)
+      } else {
+        setIsCountdownConfigured(false)
+      }
+
+      if (coreTeamData?.success && coreTeamData.coreTeam) {
+        setCoreTeam(coreTeamData.coreTeam)
+      }
+
+      if (eventOrganizersData?.success && eventOrganizersData.eventOrganizers) {
+        setEventOrganizers(eventOrganizersData.eventOrganizers)
+      }
+
+      if (registrationLinkData?.success && registrationLinkData.registrationLink) {
+        setRegistrationLink(registrationLinkData.registrationLink)
+      }
+
+      if (contactInfoData?.success && contactInfoData.contactInfo) {
+        const social = contactInfoData.contactInfo.socialMedia
+        const parsedContactInfo = {
+          ...contactInfoData.contactInfo,
+          socialMedia: typeof social === 'string'
+            ? (() => { try { return JSON.parse(social) } catch { return [] } })()
+            : (Array.isArray(social) ? social : (social ? [social] : []))
+        }
+        setContactInfo(parsedContactInfo)
+      }
+    }
+
     fetchData()
-    
+
     // Set up periodic refresh for auto-updates
     const interval = setInterval(fetchData, 30000) // Refresh every 30 seconds
-    
+
     return () => clearInterval(interval)
   }, [])
 

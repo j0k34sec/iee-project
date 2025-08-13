@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 // In-memory storage for countdown data (in production, use a database)
 let countdownData = {

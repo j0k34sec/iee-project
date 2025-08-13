@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 // Timeline phases storage - in a real app, this would be in a database
 let timelinePhases = [
